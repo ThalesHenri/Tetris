@@ -12,6 +12,8 @@ BLACK = 0, 0, 0
 WHITE = 255, 255, 255
 RED = 255, 0, 0
 GREEN = 0, 255, 0
+play_width = 200
+play_height = 400
 font = pygame.font.SysFont('comicsans', 30, True)
 """Screen Definition"""
 SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -23,14 +25,16 @@ clock = pygame.time.Clock()
 """Game functions"""
 
 
+def game_over():
+    pass
+
+
 def draw_grid():
     block = 20
-    for x in range(0, WIDTH, block):
-        for y in range(0, HEIGHT, block):
+    for x in range(10, play_width, block):
+        for y in range(10, play_height, block):
             rect = pygame.Rect(x, y, block, block)
             pygame.draw.rect(SCREEN, WHITE, rect, 1)
-
-
 
 
 def change_form():

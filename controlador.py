@@ -4,7 +4,7 @@ from pygame.locals import *
 pygame.init()
 """Game Var"""
 HEIGHT = 600
-WIDTH = 400
+WIDTH = 600
 score = 0
 FPS = 10
 run = True
@@ -13,8 +13,9 @@ WHITE = 255, 255, 255
 RED = 255, 0, 0
 GREEN = 0, 255, 0
 play_width = 200
-play_height = 400
+play_height = 300
 font = pygame.font.SysFont('comicsans', 30, True)
+block = 20
 """Screen Definition"""
 SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Tetris")
@@ -30,10 +31,9 @@ def game_over():
 
 
 def draw_grid():
-    block = 20
-    for x in range(10, play_width, block):
-        for y in range(10, play_height, block):
-            rect = pygame.Rect(x, y, block, block)
+    for x in range(0, play_width, block):
+        for y in range(0, play_height, block):
+            rect = pygame.Rect((x + play_width), (y + play_height), block, block)
             pygame.draw.rect(SCREEN, WHITE, rect, 1)
 
 

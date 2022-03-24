@@ -3,6 +3,8 @@ pygame.init()
 
 
 class Form:
-    def __init__(self):
-        self.form = form
-        self.surface = pygame.Surface((10, 10))
+    def __init__(self, x, y, shape, color):
+        self.shape = shape
+        self.x = x
+        self.y = y
+        self.color = color

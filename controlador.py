@@ -2,9 +2,11 @@ import pygame
 from pygame.locals import *
 
 pygame.init()
+
+
 """Game Var"""
-HEIGHT = 600
-WIDTH = 600
+S_HEIGHT = 700
+S_WIDTH = 600
 score = 0
 FPS = 10
 run = True
@@ -13,11 +15,12 @@ WHITE = 255, 255, 255
 RED = 255, 0, 0
 GREEN = 0, 255, 0
 play_width = 200
-play_height = 300
+play_height = 400
+play_rows = 20
 font = pygame.font.SysFont('comicsans', 30, True)
-block = 20
+block_size = 20
 """Screen Definition"""
-SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
+SCREEN = pygame.display.set_mode((S_WIDTH, S_HEIGHT))
 pygame.display.set_caption("Tetris")
 
 """Game Objects"""
@@ -31,13 +34,13 @@ def game_over():
 
 
 def draw_grid():
-    for x in range(0, play_width, block):
-        for y in range(0, play_height, block):
-            rect = pygame.Rect((x + play_width), (y + play_height), block, block)
+    for x in range(0, play_width, block_size):
+        for y in range(0, play_height, block_size):
+            rect = pygame.Rect((x + play_width), (y + play_height - 100), block_size, block_size)
             pygame.draw.rect(SCREEN, WHITE, rect, 1)
 
 
-def change_form():
+def get_form():
     pass
 
 

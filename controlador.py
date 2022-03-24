@@ -1,6 +1,7 @@
+import random
 import pygame
 from pygame.locals import *
-
+from figura import Forms
 pygame.init()
 
 
@@ -14,6 +15,7 @@ BLACK = 0, 0, 0
 WHITE = 255, 255, 255
 RED = 255, 0, 0
 GREEN = 0, 255, 0
+color_list = [BLACK, WHITE, RED, GREEN]
 play_width = 200
 play_height = 400
 play_rows = 20
@@ -41,16 +43,23 @@ def draw_grid():
 
 
 def get_form():
-    pass
+    obj1 = Forms(5, 0, (random.choice(color_list)))
+    obj1.get_shape()
+    current_form = obj1.shape
+    return current_form
+
+
 
 
 def pop_figure():
     pass
 
 
-def show_score():
+def game_fonts():
     text = font.render('Score: ' + str(score), 1, (GREEN))
     SCREEN.blit(text, (8, 10))
+    title =  font.render('Tetris', 1, (WHITE))
+    SCREEN.blit(title,(250, 100))
 
 
 """Game loop"""
@@ -62,5 +71,6 @@ while run:
     """SCREEN action"""
     SCREEN.fill(BLACK)
     draw_grid()
-    show_score()
+    game_fonts()
+    get_form()
     pygame.display.update()

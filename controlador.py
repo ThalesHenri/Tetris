@@ -18,7 +18,8 @@ GREEN = 0, 255, 0
 color_list = [BLACK, WHITE, RED, GREEN]
 play_width = 200
 play_height = 400
-play_rows = 20
+grid_rows = 20
+grid_colluns = 10
 font = pygame.font.SysFont('comicsans', 30, True)
 block_size = 20
 """Screen Definition"""
@@ -31,15 +32,23 @@ clock = pygame.time.Clock()
 """Game functions"""
 
 
+def create_grid(locked_shape={}):
+    grid = [[(BLACK) for a in range(10)] for b in range(20)]
+    for c in range(len(grid)):
+        for d in range(len(grid[c])):
+            pass
+
+
 def game_over():
     pass
 
 
 def draw_grid():
-    for x in range(0, play_width, block_size):
+    
+    """for x in range(0, play_width, block_size):
         for y in range(0, play_height, block_size):
             rect = pygame.Rect((x + play_width), (y + play_height - 100), block_size, block_size)
-            pygame.draw.rect(SCREEN, WHITE, rect, 1)
+            pygame.draw.rect(SCREEN, WHITE, rect, 1)"""
 
 
 def get_form():
@@ -51,7 +60,7 @@ def get_form():
 
 
 
-def pop_figure():
+def pop_line():
     pass
 
 
@@ -73,4 +82,5 @@ while run:
     draw_grid()
     game_fonts()
     get_form()
+    play_area(rect)
     pygame.display.update()

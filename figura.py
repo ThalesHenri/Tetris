@@ -9,7 +9,7 @@ class Forms:
         self.x = x
         self.y = y
         self.color = color
-        self.rotation = 0
+        self.rotation = 0  # até 3 rotações
 
     def get_shape(self):
         S = [['.....',

@@ -25,7 +25,7 @@ font = pygame.font.SysFont('comicsans', 30, True)
 block_size = 20
 fall_speed = 0.27
 fall_time = 0
-FPS = 10
+FPS = 40
 locked_shape = {}
 lines = 10
 col = 20
@@ -245,7 +245,7 @@ global grid
 while run:
     grid = create_grid(locked_shape)
     fall_time += clock.get_rawtime()
-    clock.tick()
+    clock.tick(FPS)
 
     for event in pygame.event.get():  # event catcher for inputs
         if event.type == QUIT:

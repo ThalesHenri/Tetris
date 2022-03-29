@@ -25,16 +25,121 @@ font = pygame.font.SysFont('comicsans', 30, True)
 block_size = 20
 fall_speed = 0.27
 fall_time = 0
+FPS = 10
 locked_shape = {}
+lines = 10
+col = 20
 change_figure = False
 """Screen Definition"""
 SCREEN = pygame.display.set_mode((S_WIDTH, S_HEIGHT))
 pygame.display.set_caption("Tetris")
 
-"""Game Objects"""
-clock = pygame.time.Clock()
-figure = Forms(5, 0, (random.choice(color_list)))
-next_figure = Forms(5, 0, (random.choice(color_list)))
+# Shapes
+S = [['.....',
+      '.....',
+      '..00.',
+      '.00..',
+      '.....'],
+     ['.....',
+      '..0..',
+      '..00.',
+      '...0.',
+      '.....']]
+
+Z = [['.....',
+      '.....',
+      '.00..',
+      '..00.',
+      '.....'],
+     ['.....',
+      '..0..',
+      '.00..',
+      '.0...',
+      '.....']]
+
+I = [['..0..',
+      '..0..',
+      '..0..',
+      '..0..',
+      '.....'],
+     ['.....',
+      '0000.',
+      '.....',
+      '.....',
+      '.....']]
+
+O = [['.....',
+      '.....',
+      '.00..',
+      '.00..',
+      '.....']]
+
+J = [['.....',
+      '.0...',
+      '.000.',
+      '.....',
+      '.....'],
+     ['.....',
+      '..00.',
+      '..0..',
+      '..0..',
+      '.....'],
+     ['.....',
+      '.....',
+      '.000.',
+      '...0.',
+      '.....'],
+     ['.....',
+      '..0..',
+      '..0..',
+      '.00..',
+      '.....']]
+
+L = [['.....',
+      '...0.',
+      '.000.',
+      '.....',
+      '.....'],
+     ['.....',
+      '..0..',
+      '..0..',
+      '..00.',
+      '.....'],
+     ['.....',
+      '.....',
+      '.000.',
+      '.0...',
+      '.....'],
+     ['.....',
+      '.00..',
+      '..0..',
+      '..0..',
+      '.....']]
+
+T = [['.....',
+      '..0..',
+      '.000.',
+      '.....',
+      '.....'],
+     ['.....',
+      '..0..',
+      '..00.',
+      '..0..',
+      '.....'],
+     ['.....',
+      '.....',
+      '.000.',
+      '..0..',
+      '.....'],
+     ['.....',
+      '..0..',
+      '.00..',
+      '..0..',
+      '.....']]
+
+shape_list = [S, Z, I, O, J, L, T]
+
+
 """Game functions"""
 
 """will create a list(a) that will have other list(b) in it.
@@ -44,9 +149,13 @@ and every element of that list(b) will have a color inside...
 witch in that case is black.
   """
 
+def get_shape():
+    color = random.choice(color_list)
+    shape = random.choice(shape_list)
+    return Forms(5, 0, color, shape)
 
 def create_grid(locked_shape):
-    grid = [[(BLACK) for a in range(10)] for b in range(20)]
+    grid = [[(BLACK) for a in range(lines)] for b in range(col)]
     for c in range(len(grid)):
         for d in range(len(grid[c])):
             if (d, c) in locked_shape:
@@ -65,7 +174,7 @@ def convert_shape(obj1):
                 positions.append((obj1.x + b, obj1.y + a))
 
     for a, pos in enumerate(positions):
-        positions[a] = (pos[0] - 2, pos[1] -4)
+        positions[a] = (pos[0] - 2, pos[1] - 4)
     return positions
 
 
@@ -76,22 +185,28 @@ def check_game_over(positions):
             return True
     return False
 
+def draw_screen(surface, grid):
+    SCREEN.fill(BLACK)
+    for a in range(len(grid)):
+        for b in range(len(grid[a])):
+            pygame.draw.rect(surface, grid[a][b], (init_x + b*block_size, init_y + a*block_size, block_size, block_size), 0)
 
-def draw_grid(surface, rows, coll):
+    pygame.draw.rect(surface, (255, 0, 0), (init_x, init_y, play_width, play_height), 5)
+
+    draw_grid(surface, grid)
+    game_fonts()
+    pygame.display.update()
+
+def draw_grid(surface, grid):
     sx = init_x  # draw the lines of the grid
     sy = init_y
-    for i in range(rows):  # Horizontal lines
+    for i in range(len(grid)):  # Horizontal lines
         pygame.draw.line(surface, (GRAY), (sx, sy + i * block_size),
         (sx + play_width, sy + i * block_size))
-        for j in range(coll):  # Vertical lines
+        for j in range(len(grid[i])):  # Vertical lines
             pygame.draw.line(surface, (GRAY), (sx + j * block_size, sy),
             (sx + j * block_size, sy + play_height))
 
-
-def get_form(obj):
-    obj.get_shape()
-    current_form = obj.shape
-    return current_form
 
 
 def valid_area(obj, grid):
@@ -117,13 +232,22 @@ def game_fonts():
     SCREEN.blit(title, (250, 100))
 
 
+"""Game Objects"""
+clock = pygame.time.Clock()
+figure = get_shape()
+next_figure = get_shape()
+
+
 """object action"""
-grid = create_grid(locked_shape)
-get_form(figure)
-get_form(next_figure)
+global grid
+
 
 """Game loop"""
 while run:
+    grid = create_grid(locked_shape)
+    fall_time += clock.get_rawtime()
+    clock.tick()
+    clock.tick(FPS)
     for event in pygame.event.get():  # event catcher for inputs
         if event.type == QUIT:
             pygame.quit()  # close the game if you click on the x button
@@ -148,8 +272,6 @@ while run:
             if not valid_area(figure, grid):
                 figure.x -= 1
 
-    fall_time += clock.get_rawtime()
-    clock.tick()
     #  Figure falling
     if fall_time / 1000 >= fall_speed:
         fall_time = 0
@@ -157,6 +279,7 @@ while run:
         if not (valid_area(figure, grid)) and figure.y > 0:
             figure.y -= 1
             change_figure = True
+
     figure_pos = convert_shape(figure)
 
     for a in range(len(figure_pos)):  # adding color to the figure
@@ -169,18 +292,11 @@ while run:
             p = (pos[0], pos[1])
             locked_shape[p] = figure.color
         figure = next_figure
-        next_figure = Forms(5, 0, (random.choice(color_list)))
-        get_form(next_figure)
+        next_figure = get_shape()
         change_figure = False
 
     if check_game_over(locked_shape):
         run = False
 
     """SCREEN action"""
-    SCREEN.fill(BLACK)
-    draw_grid(SCREEN, 20, 10)
-    pygame.draw.rect(SCREEN, ((RED)), (init_x, init_y, play_width, play_height), 4)
-    pygame.display.update()
-    game_fonts()
-    draw_grid(SCREEN,20, 10)
-    pygame.display.update()
+    draw_screen(SCREEN, grid)

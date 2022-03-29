@@ -192,7 +192,6 @@ def draw_screen(surface, grid):
             pygame.draw.rect(surface, grid[a][b], (init_x + b*block_size, init_y + a*block_size, block_size, block_size), 0)
 
     pygame.draw.rect(surface, (255, 0, 0), (init_x, init_y, play_width, play_height), 5)
-
     draw_grid(surface, grid)
     game_fonts()
     pygame.display.update()
@@ -247,10 +246,17 @@ while run:
     grid = create_grid(locked_shape)
     fall_time += clock.get_rawtime()
     clock.tick()
-    clock.tick(FPS)
+
     for event in pygame.event.get():  # event catcher for inputs
         if event.type == QUIT:
             pygame.quit()  # close the game if you click on the x button
+    #  Figure falling
+    if fall_time / 1000 >= fall_speed:
+        fall_time = 0
+        figure.y += 1
+        if not (valid_area(figure, grid)) and figure.y > 0:
+            figure.y -= 1
+            change_figure = True
     if event.type == pygame.KEYDOWN:  # keypress event
         if event.key == K_UP:  # Rotate the figure
             figure.rotation = figure.rotation + 1 % len(figure.shape)
@@ -267,18 +273,10 @@ while run:
             if not valid_area(figure, grid):
                 figure.x += 1
 
-        if event.key == _RIGHT:
+        if event.key == K_RIGHT:
             figure.x += 1
             if not valid_area(figure, grid):
                 figure.x -= 1
-
-    #  Figure falling
-    if fall_time / 1000 >= fall_speed:
-        fall_time = 0
-        figure.y += 1
-        if not (valid_area(figure, grid)) and figure.y > 0:
-            figure.y -= 1
-            change_figure = True
 
     figure_pos = convert_shape(figure)
 
@@ -297,6 +295,5 @@ while run:
 
     if check_game_over(locked_shape):
         run = False
-
-    """SCREEN action"""
     draw_screen(SCREEN, grid)
+    pygame.display.update()

@@ -11,9 +11,8 @@ S_WIDTH = 600
 play_width = 200
 play_height = 400
 """in pygame the x and y posititon starts from the top left of the screen"""
-init_x = (S_WIDTH - play_width) // 2 
+init_x = (S_WIDTH - play_width) // 2
 init_y = S_HEIGHT - play_height
-score = 0
 run = True
 BLACK = 0, 0, 0
 WHITE = 255, 255, 255
@@ -26,6 +25,8 @@ block_size = 20
 fall_speed = 0.27
 fall_time = 0
 FPS = 40
+global score
+score = 0
 locked_shape = {}
 lines = 10
 col = 20
@@ -220,8 +221,38 @@ def valid_area(obj, grid):
     return True
 
 
-def pop_line():
-    pass
+"""We gonna check backkwards in the grid if the black collor is in it.
+if the collor as not present in a row,
+then the row is completely fill with figure parts and
+shall be poped"""
+
+
+def pop_line(grid, locked):
+    inc = 0  # incrementation
+    for a in range(len(grid) - 1, -1, -1):
+        row = grid[a]
+        if (BLACK) not in row:
+            inc += 1
+            ind = a  # index
+            for b in range(len(row)):
+                try:
+                    del locked[(b, a)]
+                except:
+                    continue
+    if inc > 0:
+        for key in sorted(list(locked), key=lambda x: x[1])[::-1]:
+            x, y = key
+            if y < ind:
+                newKey = (x, y + inc)
+                locked[newKey] = locked.pop(key)
+                global score
+                score += 10
+            return score
+
+
+"""now we need to rebuild the grid, cuz when we pop it out we remove the row
+from the grid itself.
+We need to create another row and move the remaining figures down"""
 
 
 def game_fonts():
@@ -295,5 +326,7 @@ while run:
 
     if check_game_over(locked_shape):
         run = False
+
+    pop_line(grid, locked_shape)
     draw_screen(SCREEN, grid)
     pygame.display.update()

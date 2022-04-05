@@ -22,10 +22,9 @@ GRAY = 128, 128, 128
 color_list = [BLACK, WHITE, RED, GREEN, GRAY]
 font = pygame.font.SysFont('comicsans', 30, True)
 block_size = 20
-fall_speed = 0.27
+fall_speed = 0.60
 fall_time = 0
-FPS = 40
-global score
+FPS = 42
 score = 0
 locked_shape = {}
 lines = 10
@@ -150,10 +149,12 @@ and every element of that list(b) will have a color inside...
 witch in that case is black.
   """
 
+
 def get_shape():
     color = random.choice(color_list)
     shape = random.choice(shape_list)
     return Forms(5, 0, color, shape)
+
 
 def create_grid(locked_shape):
     grid = [[(BLACK) for a in range(lines)] for b in range(col)]
@@ -179,6 +180,11 @@ def convert_shape(obj1):
     return positions
 
 
+def show_score(score, surface):
+    text = font.render('Score: ' + str(score), 1, (GREEN))
+    surface.blit(text, (8, 10))
+
+
 def check_game_over(positions):
     for pos in positions:
         x, y = pos
@@ -186,7 +192,9 @@ def check_game_over(positions):
             return True
     return False
 
-def draw_screen(surface, grid):
+
+def draw_screen(surface, grid, score):
+    # everything that appears in the screen go in here
     SCREEN.fill(BLACK)
     for a in range(len(grid)):
         for b in range(len(grid[a])):
@@ -194,7 +202,8 @@ def draw_screen(surface, grid):
 
     pygame.draw.rect(surface, (255, 0, 0), (init_x, init_y, play_width, play_height), 5)
     draw_grid(surface, grid)
-    game_fonts()
+    game_title(surface)
+    show_score(score, surface)
     pygame.display.update()
 
 def draw_grid(surface, grid):
@@ -232,7 +241,7 @@ def pop_line(grid, locked):
     for a in range(len(grid) - 1, -1, -1):
         row = grid[a]
         if (BLACK) not in row:
-            inc += 1
+            inc += 10
             ind = a  # index
             for b in range(len(row)):
                 try:
@@ -245,9 +254,7 @@ def pop_line(grid, locked):
             if y < ind:
                 newKey = (x, y + inc)
                 locked[newKey] = locked.pop(key)
-                global score
-                score += 10
-            return score
+    return inc
 
 
 """now we need to rebuild the grid, cuz when we pop it out we remove the row
@@ -255,11 +262,9 @@ from the grid itself.
 We need to create another row and move the remaining figures down"""
 
 
-def game_fonts():
-    text = font.render('Score: ' + str(score), 1, (GREEN))
-    SCREEN.blit(text, (8, 10))
+def game_title(surface):
     title = font.render('Tetris', 1, (WHITE))
-    SCREEN.blit(title, (250, 100))
+    surface.blit(title, (250, 100))
 
 
 """Game Objects"""
@@ -328,5 +333,6 @@ while run:
         run = False
 
     pop_line(grid, locked_shape)
-    draw_screen(SCREEN, grid)
+    score += pop_line(grid, locked_shape)
+    draw_screen(SCREEN, grid, score)
     pygame.display.update()

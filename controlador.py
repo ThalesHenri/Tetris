@@ -11,9 +11,8 @@ S_WIDTH = 600
 play_width = 200
 play_height = 400
 """in pygame the x and y posititon starts from the top left of the screen"""
-init_x = (S_WIDTH - play_width) // 2 
+init_x = (S_WIDTH - play_width) // 2
 init_y = S_HEIGHT - play_height
-score = 0
 run = True
 BLACK = 0, 0, 0
 WHITE = 255, 255, 255
@@ -23,9 +22,10 @@ GRAY = 128, 128, 128
 color_list = [BLACK, WHITE, RED, GREEN, GRAY]
 font = pygame.font.SysFont('comicsans', 30, True)
 block_size = 20
-fall_speed = 0.27
+fall_speed = 0.60
 fall_time = 0
-FPS = 40
+FPS = 42
+score = 0
 locked_shape = {}
 lines = 10
 col = 20
@@ -149,10 +149,12 @@ and every element of that list(b) will have a color inside...
 witch in that case is black.
   """
 
+
 def get_shape():
     color = random.choice(color_list)
     shape = random.choice(shape_list)
     return Forms(5, 0, color, shape)
+
 
 def create_grid(locked_shape):
     grid = [[(BLACK) for a in range(lines)] for b in range(col)]
@@ -178,6 +180,11 @@ def convert_shape(obj1):
     return positions
 
 
+def show_score(score, surface):
+    text = font.render('Score: ' + str(score), 1, (GREEN))
+    surface.blit(text, (8, 10))
+
+
 def check_game_over(positions):
     for pos in positions:
         x, y = pos
@@ -185,7 +192,9 @@ def check_game_over(positions):
             return True
     return False
 
-def draw_screen(surface, grid):
+
+def draw_screen(surface, grid, score):
+    # everything that appears in the screen go in here
     SCREEN.fill(BLACK)
     for a in range(len(grid)):
         for b in range(len(grid[a])):
@@ -193,7 +202,8 @@ def draw_screen(surface, grid):
 
     pygame.draw.rect(surface, (255, 0, 0), (init_x, init_y, play_width, play_height), 5)
     draw_grid(surface, grid)
-    game_fonts()
+    game_title(surface)
+    show_score(score, surface)
     pygame.display.update()
 
 def draw_grid(surface, grid):
@@ -220,15 +230,41 @@ def valid_area(obj, grid):
     return True
 
 
-def pop_line():
-    pass
+"""We gonna check backkwards in the grid if the black collor is in it.
+if the collor as not present in a row,
+then the row is completely fill with figure parts and
+shall be poped"""
 
 
-def game_fonts():
-    text = font.render('Score: ' + str(score), 1, (GREEN))
-    SCREEN.blit(text, (8, 10))
+def pop_line(grid, locked):
+    inc = 0  # incrementation
+    for a in range(len(grid) - 1, -1, -1):
+        row = grid[a]
+        if (BLACK) not in row:
+            inc += 10
+            ind = a  # index
+            for b in range(len(row)):
+                try:
+                    del locked[(b, a)]
+                except:
+                    continue
+    if inc > 0:
+        for key in sorted(list(locked), key=lambda x: x[1])[::-1]:
+            x, y = key
+            if y < ind:
+                newKey = (x, y + inc)
+                locked[newKey] = locked.pop(key)
+    return inc
+
+
+"""now we need to rebuild the grid, cuz when we pop it out we remove the row
+from the grid itself.
+We need to create another row and move the remaining figures down"""
+
+
+def game_title(surface):
     title = font.render('Tetris', 1, (WHITE))
-    SCREEN.blit(title, (250, 100))
+    surface.blit(title, (250, 100))
 
 
 """Game Objects"""
@@ -295,5 +331,8 @@ while run:
 
     if check_game_over(locked_shape):
         run = False
-    draw_screen(SCREEN, grid)
+
+    pop_line(grid, locked_shape)
+    score += pop_line(grid, locked_shape)
+    draw_screen(SCREEN, grid, score)
     pygame.display.update()
